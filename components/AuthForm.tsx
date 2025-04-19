@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import FormField from "./FormField";
 
+ 
 const authFormSchema = (type: FormType) => {
   return z.object({
     name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
@@ -28,7 +29,9 @@ const authFormSchema = (type: FormType) => {
   }); 
 };
 
+
 const AuthForm = ({ type }: { type: FormType }) => {
+  console.log("Rendering AuthForm with type:", type);
   const router = useRouter();
 
   const formSchema = authFormSchema(type);
@@ -45,6 +48,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
     try {
       if (type === "sign-up") {
         const { name, email, password } = data;
+        // console.log('SIGN UP',data);
 
         const userCredential = await createUserWithEmailAndPassword(
           auth,
@@ -52,15 +56,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
           password
         );
 
-        const result = await signUp({
+       const result = await signUp({
           uid: userCredential.user.uid,
           name: name!,
           email,
           password,
         });
 
-        if (!result.success) {
-          toast.error(result.message);
+        if (!result?.success) {
+          toast.error(result?.message);
           return;
         }
 
@@ -68,7 +72,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
         router.push("/sign-in");
       } else {
         const { email, password } = data;
-
+        // console.log('SIGN IN',data);
         const userCredential = await signInWithEmailAndPassword(
           auth,
           email,
@@ -86,7 +90,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           idToken,
         });
 
-        toast.success("Signed in successfully.");
+       toast.success("Signed in successfully.");
         router.push("/");
       }
     } catch (error) {
