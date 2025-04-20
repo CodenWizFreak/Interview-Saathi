@@ -4,9 +4,8 @@ import { z } from "zod";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
-import { auth } from "@/firebase/client";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -16,20 +15,19 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 
+import { auth } from "@/firebase/client";
+import { signIn, signUp } from "@/lib/actions/auth.action";
+
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-
-import { signIn, signUp } from "@/lib/actions/auth.action";
 import FormField from "./FormField";
 
-
-const authFormSchema = (type: FormType) => {
-  return z.object({
+const authFormSchema = (type: FormType) =>
+  z.object({
     name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
     email: z.string().email(),
     password: z.string().min(3),
   });
-};
 
 const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
@@ -54,7 +52,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
           email,
           password
         );
-
         const idToken = await userCredential.user.getIdToken();
 
         const result = await signUp({
@@ -69,13 +66,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
           return;
         }
 
-        await signIn({
-          email,
-          idToken,
-        });
+        await signIn({ email, idToken });
 
         toast.success("Account created successfully.");
         router.push("/");
+        router.refresh();
       } else {
         const { email, password } = data;
 
@@ -84,20 +79,17 @@ const AuthForm = ({ type }: { type: FormType }) => {
           email,
           password
         );
-
         const idToken = await userCredential.user.getIdToken();
 
-        await signIn({
-          email,
-          idToken,
-        });
+        await signIn({ email, idToken });
 
         toast.success("Signed in successfully.");
         router.push("/");
+        router.refresh();
       }
-    } catch (error) {
-      console.log(error);
-      toast.error(There was an error: ${error});
+    } catch (error: any) {
+      console.error(error);
+      toast.error(`There was an error: ${error.message}`);
     }
   };
 
@@ -109,13 +101,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
       const user = result.user;
       const idToken = await user.getIdToken();
 
-      await signIn({
-        email: user.email!,
-        idToken,
-      });
+      await signIn({ email: user.email!, idToken });
 
       toast.success("Signed in with Google successfully.");
       router.push("/");
+      router.refresh();
     } catch (error) {
       console.error("Google Sign-In error:", error);
       toast.error("Google Sign-In failed.");
@@ -139,7 +129,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
           variant="outline"
           className="flex items-center justify-center gap-2 w-full"
         >
-
           Continue with Google
         </Button>
 
