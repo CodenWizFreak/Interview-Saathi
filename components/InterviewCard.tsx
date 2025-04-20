@@ -5,34 +5,33 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import DisplayTechIcons from "./DisplayTechIcons";
 
-import {  getRandomInterviewCover } from "@/lib/utils";
-// import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
+import { cn, getRandomInterviewCover } from "@/lib/utils";
+import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
 
 const InterviewCard = async ({
- interviewId,
+  interviewId,
   userId,
   role,
   type,
- techstack,
- createdAt,
+  techstack,
+  createdAt,
 }: InterviewCardProps) => {
-  const feedback = null as Feedback | null;
-  /*const feedback =
+  const feedback =
     userId && interviewId
       ? await getFeedbackByInterviewId({
           interviewId,
           userId,
         })
-      : null;*/
+      : null;
 
   const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
 
-  /*const badgeColor =
+  const badgeColor =
     {
       Behavioral: "bg-light-400",
       Mixed: "bg-light-600",
       Technical: "bg-light-800",
-    }[normalizedType] || "bg-light-600";*/
+    }[normalizedType] || "bg-light-600";
 
   const formattedDate = dayjs(
     feedback?.createdAt || createdAt || Date.now()
@@ -44,8 +43,10 @@ const InterviewCard = async ({
         <div>
           {/* Type Badge */}
           <div
-            className=
-              "absolute top-0 right-0 w-fit px-4 py-2 rounded-bl-lg bg-light-600"
+            className={cn(
+              "absolute top-0 right-0 w-fit px-4 py-2 rounded-bl-lg",
+              badgeColor
+            )}
           >
             <p className="badge-text ">{normalizedType}</p>
           </div>
@@ -71,7 +72,7 @@ const InterviewCard = async ({
                 height={22}
                 alt="calendar"
               />
-            <p>{formattedDate}</p>
+              <p>{formattedDate}</p>
             </div>
 
             <div className="flex flex-row gap-2 items-center">
@@ -81,7 +82,7 @@ const InterviewCard = async ({
           </div>
 
           {/* Feedback or Placeholder Text */}
-         <p className="line-clamp-2 mt-5">
+          <p className="line-clamp-2 mt-5">
             {feedback?.finalAssessment ||
               "You haven't taken this interview yet. Take it now to improve your skills."}
           </p>
@@ -89,7 +90,7 @@ const InterviewCard = async ({
 
         <div className="flex flex-row justify-between">
           <DisplayTechIcons techStack={techstack} />
-        <p>Tech Icons</p>
+
           <Button className="btn-primary">
             <Link
               href={
@@ -101,7 +102,6 @@ const InterviewCard = async ({
               {feedback ? "Check Feedback" : "View Interview"}
             </Link>
           </Button>
-        
         </div>
       </div>
     </div>
