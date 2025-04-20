@@ -1,4 +1,3 @@
-
 "use client";
 
 import { z } from "zod";
@@ -23,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import FormField from "./FormField";
 
-import { FcGoogle } from "react-icons/fc";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -99,7 +97,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(`There was an error: ${error}`);
+      toast.error(There was an error: ${error});
     }
   };
 
@@ -141,7 +139,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           variant="outline"
           className="flex items-center justify-center gap-2 w-full"
         >
-          <FcGoogle className="text-xl" />
+
           Continue with Google
         </Button>
 
@@ -203,4 +201,3 @@ const AuthForm = ({ type }: { type: FormType }) => {
 };
 
 export default AuthForm;
-
