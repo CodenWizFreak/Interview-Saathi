@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import FormField from "./FormField";
 
-import { FcGoogle } from "react-icons/fc";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -141,7 +140,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           variant="outline"
           className="flex items-center justify-center gap-2 w-full"
         >
-          <FcGoogle className="text-xl" />
+
           Continue with Google
         </Button>
 
