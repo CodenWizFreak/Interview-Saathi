@@ -11,8 +11,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
 } from "firebase/auth";
 
 import { auth } from "@/firebase/client";
@@ -93,25 +91,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
     }
   };
 
-  const handleGoogleAuth = async () => {
-    const provider = new GoogleAuthProvider();
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const idToken = await user.getIdToken();
-
-      await signIn({ email: user.email!, idToken });
-
-      toast.success("Signed in with Google successfully.");
-      router.push("/");
-      router.refresh();
-    } catch (error) {
-      console.error("Google Sign-In error:", error);
-      toast.error("Google Sign-In failed.");
-    }
-  };
-
   const isSignIn = type === "sign-in";
 
   return (
@@ -123,20 +102,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
         </div>
 
         <h3>Practice job interviews with AI</h3>
-
-        <Button
-          onClick={handleGoogleAuth}
-          variant="outline"
-          className="flex items-center justify-center gap-2 w-full"
-        >
-          Continue with Google
-        </Button>
-
-        <div className="flex items-center gap-2">
-          <hr className="flex-1 border border-gray-200" />
-          <span className="text-sm text-gray-400">OR</span>
-          <hr className="flex-1 border border-gray-200" />
-        </div>
 
         <Form {...form}>
           <form
