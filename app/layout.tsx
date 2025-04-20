@@ -11,7 +11,7 @@ const monaSans = Mona_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Deathrow",
+  title: "Interview Saathi",
   description: "Complete AI solution to getting hired",
 };
 
