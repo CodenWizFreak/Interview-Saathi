@@ -7,18 +7,21 @@ import { isAuthenticated } from "@/lib/actions/auth.action";
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
   const isUserAuthenticated = await isAuthenticated();
-  if (!isUserAuthenticated) redirect("/sign-in");
+
+  if (!isUserAuthenticated) {
+    redirect("/sign-in");
+  }
 
   return (
     <div className="root-layout">
-      <nav>
+      <nav className="flex items-center justify-between px-6 py-4 shadow">
         <Link href="/" className="flex items-center gap-2">
           <Image src="/logo.svg" alt="MockMate Logo" width={38} height={32} />
-          <h2 className="text-primary-100">Deathrow</h2>
+          <h2 className="text-primary-100 text-xl font-semibold">Deathrow</h2>
         </Link>
       </nav>
 
-      {children}
+      <main className="p-6">{children}</main>
     </div>
   );
 };
