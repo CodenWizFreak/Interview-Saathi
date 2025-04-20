@@ -1,3 +1,4 @@
+
 "use client";
 
 import { z } from "zod";
@@ -12,6 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 
 import { Form } from "@/components/ui/form";
@@ -20,21 +23,20 @@ import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import FormField from "./FormField";
 
- 
+import { FcGoogle } from "react-icons/fc";
+
 const authFormSchema = (type: FormType) => {
   return z.object({
     name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
     email: z.string().email(),
     password: z.string().min(3),
-  }); 
+  });
 };
 
-
 const AuthForm = ({ type }: { type: FormType }) => {
-  console.log("Rendering AuthForm with type:", type);
   const router = useRouter();
-
   const formSchema = authFormSchema(type);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,7 +50,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
     try {
       if (type === "sign-up") {
         const { name, email, password } = data;
-        // console.log('SIGN UP',data);
 
         const userCredential = await createUserWithEmailAndPassword(
           auth,
@@ -56,7 +57,9 @@ const AuthForm = ({ type }: { type: FormType }) => {
           password
         );
 
-       const result = await signUp({
+        const idToken = await userCredential.user.getIdToken();
+
+        const result = await signUp({
           uid: userCredential.user.uid,
           name: name!,
           email,
@@ -68,11 +71,16 @@ const AuthForm = ({ type }: { type: FormType }) => {
           return;
         }
 
-        toast.success("Account created successfully. Please sign in.");
-        router.push("/sign-in");
+        await signIn({
+          email,
+          idToken,
+        });
+
+        toast.success("Account created successfully.");
+        router.push("/");
       } else {
         const { email, password } = data;
-        // console.log('SIGN IN',data);
+
         const userCredential = await signInWithEmailAndPassword(
           auth,
           email,
@@ -80,22 +88,39 @@ const AuthForm = ({ type }: { type: FormType }) => {
         );
 
         const idToken = await userCredential.user.getIdToken();
-        if (!idToken) {
-          toast.error("Sign in Failed. Please try again.");
-          return;
-        }
 
         await signIn({
           email,
           idToken,
         });
 
-       toast.success("Signed in successfully.");
+        toast.success("Signed in successfully.");
         router.push("/");
       }
     } catch (error) {
       console.log(error);
-      toast.error(There was an error: ${error});
+      toast.error(`There was an error: ${error}`);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const idToken = await user.getIdToken();
+
+      await signIn({
+        email: user.email!,
+        idToken,
+      });
+
+      toast.success("Signed in with Google successfully.");
+      router.push("/");
+    } catch (error) {
+      console.error("Google Sign-In error:", error);
+      toast.error("Google Sign-In failed.");
     }
   };
 
@@ -110,6 +135,21 @@ const AuthForm = ({ type }: { type: FormType }) => {
         </div>
 
         <h3>Practice job interviews with AI</h3>
+
+        <Button
+          onClick={handleGoogleAuth}
+          variant="outline"
+          className="flex items-center justify-center gap-2 w-full"
+        >
+          <FcGoogle className="text-xl" />
+          Continue with Google
+        </Button>
+
+        <div className="flex items-center gap-2">
+          <hr className="flex-1 border border-gray-200" />
+          <span className="text-sm text-gray-400">OR</span>
+          <hr className="flex-1 border border-gray-200" />
+        </div>
 
         <Form {...form}>
           <form
@@ -163,3 +203,4 @@ const AuthForm = ({ type }: { type: FormType }) => {
 };
 
 export default AuthForm;
+
