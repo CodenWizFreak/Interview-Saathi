@@ -66,22 +66,16 @@ const Page = async() => {
         <h2>Take Interviews</h2>
 
          <div className="interviews-section">
-          {hasUpcomingInterviews ? (
-            allInterview?.map((interview) => (
-              <InterviewCard
-                key={interview.id}
-                userId={user?.id}
-                interviewId={interview.id}
-                role={interview.role}
-                type={interview.type}
-                techstack={interview.techstack}
-                createdAt={interview.createdAt}
-              />
+        
+              {
+          hasUpcomingInterviews ? (
+            latestInterviews?.map((interview) => (
+              <InterviewCard {...interview} key={interview.id}/>
             ))
           ) : (
             <p>There are no interviews available</p>
           )}
-        </div> 
+        </div>
       </section>
     </>
   );
